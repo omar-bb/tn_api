@@ -64,10 +64,3 @@ class TNApi(metaclass=TNApiMeta):
         urls = [a["href"] for a in div.find_all("a")] + [a["href"] for a in div2.find_all("a")]
 
 
-
-if __name__ == "__main__":
-    tnapi = TNApi()
-
-    results = tnapi.get_top_48h()
-    with open("data.json", "w", encoding="utf-8") as f:
-        f.write(results)
