@@ -7,9 +7,10 @@ import re
 class Article:
     """The article class"""
 
-    def __init__(self, title, content, imgs=None) -> None:
-        self.title = title
-        self.content = content
+    def __init__(self, story, iconography, body_text, imgs=None) -> None:
+        self.story = story
+        self.iconography = iconography
+        self.body_text = body_text
         if imgs is None:
             self.imgs = []
         else:
@@ -20,11 +21,12 @@ class Article:
         content = requests.get(url).content
         soup = BeautifulSoup(content, "html.parser")
 
-        title = cls._get_article_title(soup)
-        content = cls._get_article_content(soup)
+        story = cls._get_article_story(soup)
+        iconography = cls._get_article_iconography(soup)
+        body_text = cls._get_article_body_text(soup)
         imgs = cls._get_article_imgs(soup)
 
-        return cls(title, content, imgs)
+        return cls(story, iconography, body_text, imgs)
 
     @staticmethod
     def _get_tags_from_delimiters(
@@ -40,20 +42,31 @@ class Article:
         return content_new
 
     @staticmethod
-    def _get_article_title(soup: BeautifulSoup) -> str:
-        title = soup.find(
+    def _get_article_story(soup: BeautifulSoup) -> str:
+        story = soup.find(
             "h1", class_="post-title entry-title left").text.strip()
 
-        return title
+        return story
 
     @staticmethod
-    def _get_article_content(soup: BeautifulSoup) -> str:
+    def _get_article_iconography(soup: BeautifulSoup) -> str:
+        div = soup.find("div", id="post-feat-img")
+        if div:
+            iconography = div.find("img")["src"]
+            return iconography
+        div = soup.find("div", id="video-embed")
+        iconography = div.find("iframe")["src"]
+
+        return iconography
+
+    @staticmethod
+    def _get_article_body_text(soup: BeautifulSoup) -> str:
         div = soup.find("div", id="content-main")
         delimiters = div.find_all("div", class_="simplesocialbuttons")
-        content = Article._get_tags_from_delimiters(delimiters)
-        content = re.sub("\\s+", " ", content.text.strip())
+        body_text = Article._get_tags_from_delimiters(delimiters)
+        body_text = re.sub("\\s+", " ", body_text.text.strip())
 
-        return content
+        return body_text
 
     @staticmethod
     def _get_article_imgs(soup: BeautifulSoup) -> list[str]:
@@ -66,13 +79,7 @@ class Article:
         return imgs
 
     def __repr__(self) -> str:
-        return f"Article('{self.title}', '{self.content}', {self.imgs})"
+        return f"Article('{self.story}', '{self.iconography}', '{self.body_text}', {self.imgs})"
 
     def __str__(self) -> str:
         return str(self.__dict__)
-
-
-if __name__ == "__main__":
-    article = Article.from_url(
-        "https://sport.tunisienumerique.com/sport-tunisien-programme-tv-des-matches-de-dimanche-3/")
-    print(str(article))
