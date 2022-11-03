@@ -62,9 +62,15 @@ class TNApi(metaclass=TNApiMeta):
 
     def get_articles_highlights(self) -> str:
         soup = self._make_soup(self.URL)
-        div = soup.find_all("div", class_="feat-widget-cont left relative")[0]
-        div2 = soup.find_all("div", class_="blog-widget-wrap left relative")[0]
+        head_article_div = soup.find_all("div", class_="feat-widget-cont")[0]
+        sub_articles_div = soup.find_all("div", class_="blog-widget-wrap")[0]
 
-        urls = [a["href"] for a in div.find_all("a")] + [a["href"] for a in div2.find_all("a")]
+        head_article_url = head_article_div.find_all("a")[0]["href"]
+        sub_articles_url = [a["href"] for a in sub_articles_div.find_all("a")]
+        urls = [head_article_url] + sub_articles_url
 
+        articles_highlights = self._get_all_articles(urls)
 
+        return self._format_to_json(
+            articles_highlights,
+            ft_name="articles_highlights")
