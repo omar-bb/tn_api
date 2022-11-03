@@ -29,8 +29,11 @@ class TNApi(metaclass=TNApiMeta):
 
         return soup
 
-    # static?
-    def _format_to_json(self, articles: list[Article], ft_name="articles") -> str:
+    # static?, ft_name (variable name) needs to be changed
+    def _format_to_json(
+            self,
+            articles: list[Article],
+            ft_name="articles") -> str:
         articles = list(map(lambda x: x.__dict__, articles))  # type: ignore
         articles_dict = {ft_name: articles}
 
@@ -54,7 +57,8 @@ class TNApi(metaclass=TNApiMeta):
         urls = [a["href"] for a in div.find_all("a")]
 
         top_48h_articles = self._get_all_articles(urls)
-        return self._format_to_json(top_48h_articles, ft_name="top_48h_articles")
+        return self._format_to_json(
+            top_48h_articles, ft_name="top_48h_articles")
 
     def get_articles_highlights(self):
         soup = self._make_soup(self.URL)
