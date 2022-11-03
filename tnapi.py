@@ -60,7 +60,7 @@ class TNApi(metaclass=TNApiMeta):
         return self._format_to_json(
             top_48h_articles, ft_name="top_48h_articles")
 
-    def get_articles_highlights(self):
+    def get_articles_highlights(self) -> str:
         soup = self._make_soup(self.URL)
         div = soup.find_all("div", class_="feat-widget-cont left relative")[0]
         div2 = soup.find_all("div", class_="blog-widget-wrap left relative")[0]
